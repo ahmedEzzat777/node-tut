@@ -1,10 +1,25 @@
 console.log('before');
+// promise based approach
+// getUser(1)
+//     .then(user => displayUser(user))
+//     .then(repos => displayRepos(repos[0]))
+//     .then(commits => displayCommits(commits))
+//     .catch(err => console.log('Error ', err.message));
 
-getUser(1)
-    .then(user => displayUser(user))
-    .then(repos => displayRepos(repos[0]))
-    .then(commits => displayCommits(commits))
-    .catch(err => console.log('Error ', err.message));
+//async and await operations
+async function displayCommitsAsync() {
+    try {
+        const user = await getUser(1);
+        const repos = await getRepositories(user.gitHubUsername);
+        const commits = await getCommits(repos[0]);
+        console.log(commits);    
+    }
+    catch(err) {
+        console.log(err);
+    }
+}
+
+displayCommitsAsync();
 
 console.log('After');
 
@@ -36,6 +51,7 @@ function getRepositories(username) {
         setTimeout(() => {
             console.log('getting a list of repositories from gh api...');
             resolve(['repo1', 'repo2', 'repo3']);
+            //reject('couldnt get repos');
         }, 2000);
     });
 }
