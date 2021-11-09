@@ -1,39 +1,50 @@
 console.log('before');
-getUser(1, displayUser);
+
+getUser(1)
+    .then(user => displayUser(user))
+    .then(repos => displayRepos(repos[0]))
+    .then(commits => displayCommits(commits))
+    .catch(err => console.log('Error ', err.message));
+
 console.log('After');
 
 function displayUser(user){
     console.log('User', user);
-    getRepositories(user.gitHubUsername, displayRepos);
+    return getRepositories(user.gitHubUsername, displayRepos);
 }
 
 function displayRepos(repos) {
     console.log('repos', repos);
-    getCommits(repos[0], displayCommits);
+    return getCommits(repos[0], displayCommits);
 }
 
 function displayCommits(commits) {
     console.log('commits', commits);
 }
 
-function getUser(id, callback) {
-
-    setTimeout(() => {
-        console.log('reading a user from a database...');
-        callback({id: id, gitHubUsername: 'jack'});
-    }, 2000);
+function getUser(id) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            console.log('reading a user from a database...');
+            resolve({id: id, gitHubUsername: 'jack'});
+        }, 2000);
+    });
 }
 
-function getRepositories(username, callback) {
-    setTimeout(() => {
-        console.log('getting a list of repositories from gh api...');
-        callback(['repo1', 'repo2', 'repo3']);
-    }, 2000);
+function getRepositories(username) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            console.log('getting a list of repositories from gh api...');
+            resolve(['repo1', 'repo2', 'repo3']);
+        }, 2000);
+    });
 }
 
 function getCommits(repo, callback) {
-    setTimeout(() => {
-        console.log('getting a list of commits from gh api...');
-        callback(['commit1', 'commit2']);
-    }, 1000);
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                console.log('getting a list of commits from gh api...');
+                resolve(['commit1', 'commit2']);
+            }, 1000);
+        });
 }
