@@ -37,8 +37,11 @@ async function getCourses() {
     //lte ==> less than or equal
     //in
     //nin => not in
+    const pageNumber = 2;
+    const pageSize = 10;
+    // /api/courses?pageNumber=2&pageSize=10
     const courses = await Course
-        //.find({author:'Mosh', isPublished: true})
+        .find({author:'Mosh', isPublished: true})
         //.find({price: {$gte: 10, $lte: 20}}) //greater than or eq 10 less than or eq 20
         //.find({price: {$in: [10,15,20]}}) //10 or 15 or 20
         // .find()
@@ -46,8 +49,9 @@ async function getCourses() {
         // .and([])
         //.find({author: /^Mosh/}) //starts with Mosh
         //.find({author:/Hamedani$/i}) //ends with hamedani case insen
-        .find({author:/.*Mosh.*/i})
-        .limit(10)
+        //.find({author:/.*Mosh.*/i})
+        .skip((pageNumber - 1)*pageSize)
+        .limit(pageSize) //pagination
         .sort({name:1})
         .select({name:1, tags:1});
 
