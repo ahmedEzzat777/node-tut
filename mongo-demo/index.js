@@ -40,7 +40,13 @@ async function getCourses() {
     const courses = await Course
         //.find({author:'Mosh', isPublished: true})
         //.find({price: {$gte: 10, $lte: 20}}) //greater than or eq 10 less than or eq 20
-        .find({price: {$in: [10,15,20]}}) //10 or 15 or 20
+        //.find({price: {$in: [10,15,20]}}) //10 or 15 or 20
+        // .find()
+        // .or([{author:'Mosh'},{isPublished:true}])
+        // .and([])
+        //.find({author: /^Mosh/}) //starts with Mosh
+        //.find({author:/Hamedani$/i}) //ends with hamedani case insen
+        .find({author:/.*Mosh.*/i})
         .limit(10)
         .sort({name:1})
         .select({name:1, tags:1});
