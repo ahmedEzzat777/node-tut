@@ -15,7 +15,15 @@ const schema = mongoose.Schema({
 
 const Course = mongoose.model('Course', schema);
 
-GetCourses()
+// GetCourses()
+//     .then((courses) => console.log(courses))
+//     .catch((err) => console.log(err));
+
+// GetCourses2()
+//     .then((courses) => console.log(courses))
+//     .catch((err) => console.log(err));
+
+GetCourses3()
     .then((courses) => console.log(courses))
     .catch((err) => console.log(err));
 
@@ -31,4 +39,21 @@ async function GetCourses() {
         name:1,
         author:1
     }); // select('name author');
+}
+
+async function GetCourses2() {
+    return await Course.find({isPublished:true})
+    .or([{tags:'backend'}, {tags:'frontend'}]) // can also use just find({isPublished:true, tags:{$in:['backend','frontend']}})
+    .sort({
+        price:-1
+    }) //or sort('name') asc sort('-name') desc
+    .select({
+        name:1,
+        author:1
+    }); // select('name author');
+}
+
+async function GetCourses3() {
+    return await Course.find({isPublished:true})
+    .or([{price: {$gte:15}}, {name: /.*by.*/i}]);
 }

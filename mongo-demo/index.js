@@ -14,7 +14,11 @@ const courseSchema = new mongoose.Schema({
 
 const Course = mongoose.model('Course', courseSchema);
 
-getCourses();
+//createCourse();
+//getCourses();
+//UpdateCourse('618e5de6a5f46521f14a15da');
+//UpdateCourse_UpdateFirst('618e5de6a5f46521f14a15da');
+UpdateCourse_UpdateFirst2('618e5de6a5f46521f14a15da');
     
 async function createCourse() {
     const course = new Course({
@@ -56,4 +60,49 @@ async function getCourses() {
         .select({name:1, tags:1});
 
     console.log(courses);
+}
+
+async function UpdateCourse(id) {
+    const course = await Course.findById(id);
+    if(!course) return;
+
+    // course.isPublished = true;
+    // course.author = 'Another author';
+
+    course.set({
+        isPublished:true,
+        author:'Another author'
+    });
+
+    const result = await course.save();
+    console.log(course);
+}
+
+async function UpdateCourse_UpdateFirst(id) {
+    const res = await Course.update({_id:id}, {
+        $set:{
+            isPublished:true,
+            name:'new author'
+        }
+    });
+
+    console.log(res);
+}
+
+async function UpdateCourse_UpdateFirst2(id) {
+    const res = await Course.findByIdAndUpdate(id, {
+        $set:{
+            isPublished:true,
+            name:'jason'
+        }
+    },
+    {new: true});
+
+    console.log(res);
+}
+
+async function removeCourse(id) {
+    // const result = await Course.deleteOne({_id: id});
+    // const result = await Course.deleteMany( {name: /.*Mosh.*/ });
+    const course = await Course.findByIdAndDelete(id);
 }
