@@ -5,31 +5,56 @@ mongoose.connect('mongodb://localhost/playground')
     .catch(err => console.error('could not connect to mongodb', err));
 
 const courseSchema = new mongoose.Schema({
-    name: String,
+    //name: String,
+    name: {
+        type: String,
+        required:true,
+        minlength:3,
+        maxlength:255,
+        //match:/pat/
+        },
+    category:{
+        type: String,
+        enum: ['web', 'mobile', 'network']
+    },
     author: String,
     tags: [String],
     date: { type: Date, default: Date.now},
-    isPublished: Boolean
+    isPublished: Boolean,
+    price:{
+        type: Number,
+        min:10,
+        max:200, //also for dates
+        required: function() { //cannot use arrow function here, this will not refer to current model
+            return this.isPublished;
+        }
+    }
 });
 
 const Course = mongoose.model('Course', courseSchema);
 
-//createCourse();
+createCourse();
 //getCourses();
 //UpdateCourse('618e5de6a5f46521f14a15da');
 //UpdateCourse_UpdateFirst('618e5de6a5f46521f14a15da');
-UpdateCourse_UpdateFirst2('618e5de6a5f46521f14a15da');
+//UpdateCourse_UpdateFirst2('618e5de6a5f46521f14a15da');
     
 async function createCourse() {
     const course = new Course({
-        name: 'Angular course',
+        name: 'Angular Course',
         author: 'Mosh',
+        category: '-',
         tags: ['angular', 'frontend'],
-        isPublished: true
+        isPublished: true,
+        price: 10
     });
-    
-    const result = await course.save();
-    console.log(result);
+    try{
+        //await course.validate(); //throws an exception if there's an error
+        const result = await course.save();
+        console.log(result);
+    } catch (err){
+        console.error(err.message);
+    }
 }
 
 async function getCourses() {
