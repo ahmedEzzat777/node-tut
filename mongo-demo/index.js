@@ -15,10 +15,20 @@ const courseSchema = new mongoose.Schema({
         },
     category:{
         type: String,
-        enum: ['web', 'mobile', 'network']
+        enum: ['web', 'mobile', 'network'],
+        lowercase: true,
+        trim: true
     },
     author: String,
-    tags: [String],
+    tags: {
+        type:[String],
+        validate:{
+            validator: async function(v) {
+                return await validateTags(v);
+            },
+            message:'a course should have atleast one tag'
+        }
+    },
     date: { type: Date, default: Date.now},
     isPublished: Boolean,
     price:{
@@ -27,9 +37,19 @@ const courseSchema = new mongoose.Schema({
         max:200, //also for dates
         required: function() { //cannot use arrow function here, this will not refer to current model
             return this.isPublished;
-        }
+        },
+        get: v => Math.round(v),
+        set: v => Math.round(v),
     }
 });
+
+function validateTags(v) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve(v && v.length > 0);
+        }, 2000);
+    });
+}
 
 const Course = mongoose.model('Course', courseSchema);
 
@@ -43,17 +63,18 @@ async function createCourse() {
     const course = new Course({
         name: 'Angular Course',
         author: 'Mosh',
-        category: '-',
+        category: 'Web',
         tags: ['angular', 'frontend'],
         isPublished: true,
-        price: 10
+        price: 10.696262
     });
     try{
         //await course.validate(); //throws an exception if there's an error
         const result = await course.save();
         console.log(result);
-    } catch (err){
-        console.error(err.message);
+    } catch (ex){
+        for(field in ex.errors)
+            console.error(ex.errors[field].message);
     }
 }
 
