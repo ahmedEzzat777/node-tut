@@ -18,5 +18,5 @@ function validateGenre(genre) {
 
 module.exports.Genre = Genre;
 module.exports.validate = validateGenre;
-module.exports.genreSchema = {schema:schema, joiSchema:joiSchema};
+module.exports.genreSchema = schema;
 

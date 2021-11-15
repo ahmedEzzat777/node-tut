@@ -25,19 +25,15 @@ router.post('/', async (req, res) =>{
     if(result.error)
         return res.status(400).send(result.error.details[0].message);
 
-    let genre = await Genre.findOne({name:movie.genre.name});
+    let genre = await Genre.findById(movie.genreId);
     
     if(!genre){
-        genre = new Genre({
-            name:movie.genre.name
-        });
-        
-        await genre.save();
+        return res.status(404).send('genre doesnt exist');
     }
 
     movie = new Movie({
         title: movie.title,
-        genre: genre,
+        genre: {_id:genre._id, name:genre.name},
         numberInStock: movie.numberInStock,
         dailyRentalRate: movie.dailyRentalRate
     });
@@ -52,21 +48,17 @@ router.put('/:id', async (req, res) =>{
     if(result.error)
         return res.status(400).send(result.error.details[0].message);
 
-    let genre = await Genre.findOne({name:req.body.genre.name});
+    let genre = await Genre.findById(req.body.genreId);
 
     if(!genre){
-        genre = new Genre({
-            name:req.body.genre.name
-        });
-        
-        await genre.save();
+        return res.status(404).send('genre doesnt exist');
     }
 
     const movie = await Movie.findOneAndUpdate({_id:id}, {
         $set:{
             name:req.body.name,
             title: req.body.title,
-            genre: genre,
+            genre: {_id:genre._id, name:genre.name},
             numberInStock: req.body.numberInStock,
             dailyRentalRate: req.body.dailyRentalRate
         }
