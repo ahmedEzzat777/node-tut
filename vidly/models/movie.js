@@ -18,7 +18,7 @@ function validateMovie(genre) {
         title: Joi.string().required().min(3),
         numberInStock: Joi.number().min(0),
         dailyRentalRate: Joi.number().min(0),
-        genreId:Joi.string()
+        genreId:Joi.string().regex(/^[a-f\d]{24}$/i)
     });
 
     return schema.validate(genre);
