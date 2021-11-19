@@ -4,6 +4,14 @@ const express = require('express');
 const router = express.Router();
 const {Genre, validate} = require('../models/genre');
 
+
+// // another method of handling errors (other than 'express-async-errors')
+// const asyncMiddleware = require('../middleware/async');
+// router.get('/', asyncMiddleware(async (req, res) => {
+//     const genres = await Genre.find()
+//     res.send(genres);
+// }));
+
 router.get('/', async (req, res) => {
     const genres = await Genre.find()
     res.send(genres);
