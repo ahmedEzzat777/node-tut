@@ -2,6 +2,7 @@ const express = require('express');
 const Joi = require('joi');
 const router = express.Router();
 const {Customer, validate} = require('../models/customer');
+const auth = require('../middleware/auth');
 
 router.get('/', async (req, res) => {
     const customers = await Customer.find();
@@ -18,7 +19,7 @@ router.get('/:id', async (req, res) => {
     res.send(customer);
 });
 
-router.post('/', async (req, res) =>{
+router.post('/', auth, async (req, res) =>{
     let customer = req.body;
     const result = validate(customer);
 
@@ -34,7 +35,7 @@ router.post('/', async (req, res) =>{
     return res.send(await customer.save());
 });
 
-router.put('/:id', async (req, res) =>{
+router.put('/:id', auth, async (req, res) =>{
     const id = req.params.id;
     const result = validate(req.body);
 
@@ -55,7 +56,7 @@ router.put('/:id', async (req, res) =>{
     return res.send(customer);
 });
 
-router.delete('/:id', async (req, res) =>{
+router.delete('/:id', auth, async (req, res) =>{
     const id = req.params.id;
     const customer = await Customer.findByIdAndDelete(id);
 

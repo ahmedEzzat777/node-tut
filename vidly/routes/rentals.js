@@ -4,10 +4,12 @@ const {Rental, validate} = require('../models/rental');
 const {Customer} = require('../models/customer');
 const {Movie} = require('../models/movie');
 const mongoose = require('mongoose');
+const auth = require('../middleware/auth');
+
 //const Fawn = require('fawn');
 //Fawn.init(mongoose); //refused to work
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     let rental = req.body;
     const result = validate(rental);
 
