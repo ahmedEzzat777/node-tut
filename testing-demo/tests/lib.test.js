@@ -1,4 +1,6 @@
 const lib = require('../lib');
+const db = require('../db');
+const mail = require('../mail');
 
 describe('absolute', () => {
     it('should return a positive if input is positive', () => {
@@ -64,5 +66,41 @@ describe('registerUser', () => { //parametrized test, could also be done by a fo
         const result = lib.registerUser('Mosh');
         expect(result).toMatchObject({username:'Mosh'});
         expect(result.id).toBeGreaterThan(0);
+    });
+});
+
+describe('getDiscount', () => {
+    it('should apply 10% discount if customer has more than 10 points', () => {
+        db.getCustomerSync = function(customerId) {
+            console.log('fake/mock reading customer');
+            return { id: customerId, points: 11 };
+        };
+        const order = {customerId:1, totalPrice:10};
+        lib.applyDiscount(order);
+        expect(order.totalPrice).toBe(9);
+    });
+});
+
+describe('notifyCustomers', () => {
+    it('should send a mail to the client', () => {
+        //const mockFunction = jest.fn();
+        //mockFunction.mockReturnValue(1);
+        //mockFunction.mockResolvedValue(1);
+        //await mockFunction();
+        //mockFunction.mockRejectedValue(new Error('...'));
+
+        db.getCustomerSync = jest.fn().mockReturnValue({email:'a'});
+        mail.send = jest.fn();
+
+        // let mailSent = false;
+        // mail.send = function() {
+        //     mailSent = true;
+        // }
+
+        lib.notifyCustomer({customerId:1, email:'a'});
+
+        expect(mail.send).toHaveBeenCalled(); //toHaveBeenCalledWith
+        expect(mail.send.mock.calls[0][0]).toBe('a'); //check first argument for the first call
+        expect(mail.send.mock.calls[0][1]).toMatch(/order/); //check second argument for the first call
     });
 });
