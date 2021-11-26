@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 const Joi = require('joi');
 
 const schema = mongoose.Schema({
-    name:{type:String, minlength:3, required:true}
+    name:{type:String, minlength:3, maxlength:50, required:true}
 });
 
 const Genre = mongoose.model('Genre', schema);
 
 const joiSchema = Joi.object({
     _id:Joi.string().length(12),
-    name: Joi.string().required().min(3)
+    name: Joi.string().required().min(3).max(50)
 });
 
 function validateGenre(genre) {

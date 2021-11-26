@@ -3,7 +3,8 @@ const admin = require('../middleware/admin');
 const express = require('express');
 const router = express.Router();
 const {Genre, validate} = require('../models/genre');
-
+const mongoose = require('mongoose');
+const validateObjectId = require('../middleware/validateObjectId');
 
 // // another method of handling errors (other than 'express-async-errors')
 // const asyncMiddleware = require('../middleware/async');
@@ -17,8 +18,9 @@ router.get('/', async (req, res) => {
     res.send(genres);
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', validateObjectId, async (req, res) => {
     const id = req.params.id;
+
     const genre = await Genre.findById(id);
 
     if(!genre)
