@@ -19,7 +19,7 @@ describe('/api/genres', () => {
                 {name:'genre2'},
             ]);
 
-            const res = await request(server).get('/api/genres');
+            const res = await request(server).get('/api/genres/');
             expect(res.status).toBe(200);
             expect(res.body.length).toBe(2);
             expect(res.body.some(g => g.name == 'genre1')).toBeTruthy();
@@ -35,8 +35,8 @@ describe('/api/genres', () => {
 
             const res = await request(server).get('/api/genres/' + genre._id);
             expect(res.status).toBe(200);
-            expect(res.body).toMatchObject({_id:genre._id, name:genre.name});
-            //expect(res.body).toHaveProperty('name', 'genre');
+            //expect(res.body).toMatchObject(genre);
+            expect(res.body).toHaveProperty('name', 'genre');
         });
 
         it('should return 404 if failed to find the genre', async() => {
@@ -107,4 +107,101 @@ describe('/api/genres', () => {
             expect(res.body).toHaveProperty('name', 'genre1');
         });
     });
+
+    describe('DELETE /', () => {
+        let id;
+        let token;
+
+        beforeEach(async() => {
+            token = new User({isAdmin:true}).generateAuthToken();
+            const genre = new Genre({name:'genre1'});
+            await genre.save();
+            id = genre._id;
+        });
+
+        afterEach(async() => {await Genre.remove({});})
+
+        const exec = async () => {
+            return await request(server)
+                .delete('/api/genres/' + id)
+                .set('x-auth-token', token);
+        };
+
+        it('should delete the genre from mongodb if correct genre is passed', async() => {
+            const result = await exec();
+
+            const storeGenre = await Genre.findById(id);
+            expect(storeGenre).toBeFalsy();
+        });
+
+        it('should return the deleted genre if correct genre is passed', async() => {
+            const result = await exec();
+
+            expect(result.body).toHaveProperty('_id', id.toHexString());
+            expect(result.body).toHaveProperty('name', 'genre1');
+        });
+
+        it('should return 404 if invalid id is passed', async() => {
+            id = mongoose.Types.ObjectId();
+            const result = await exec();
+
+            expect(result.status).toBe(404);
+        });
+
+        it('should return 403 if user is not an admin', async() => {
+            token = new User().generateAuthToken();
+            const result = await exec();
+
+            expect(result.status).toBe(403);
+        });
+    });
+
+    describe('PUT /', () => {
+        let id;
+        let token;
+        let name;
+
+        beforeEach(async() => {
+            token = new User().generateAuthToken();
+            const genre = new Genre({name:'genre1'});
+            await genre.save();
+            id = genre._id.toHexString();
+            name = 'genre2';
+        });
+        
+        const exec = async() => {
+            return await request(server)
+                .put('/api/genres/' + id)
+                .set('x-auth-token', token)
+                .send({name});
+        };
+    
+        it('should modify name to genre2 in db if correct genre id is passed', async() => {
+            const result = await exec();
+    
+            const genre = await Genre.findById(id);
+    
+            expect(result.status).toBe(200);
+            expect(genre.name).toBe('genre2');
+        });
+
+        it('should return 400 if invalid new name is passed', async() => {
+            name = '12';
+            const result = await exec();
+    
+            const genre = await Genre.findById(id);
+    
+            expect(result.status).toBe(400);
+        });
+
+        it('should return 404 if invalid genre id is passed', async() => {
+            id = new mongoose.Types.ObjectId();
+            const result = await exec();
+    
+            const genre = await Genre.findById(id);
+    
+            expect(result.status).toBe(404);
+        });
+    });
 });
+

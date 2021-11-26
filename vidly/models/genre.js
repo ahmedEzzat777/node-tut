@@ -8,7 +8,7 @@ const schema = mongoose.Schema({
 const Genre = mongoose.model('Genre', schema);
 
 const joiSchema = Joi.object({
-    _id:Joi.string().length(12),
+    _id:Joi.string().regex(/^[a-f\d]{24}$/i),
     name: Joi.string().required().min(3).max(50)
 });
 

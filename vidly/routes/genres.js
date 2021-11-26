@@ -50,7 +50,7 @@ router.put('/:id', auth, async (req, res) =>{
     if(result.error)
         return res.status(400).send(result.error.details[0].message);
 
-    const genre = await Genre.Genre.findOneAndUpdate({_id:id}, {
+    const genre = await Genre.findOneAndUpdate({_id:id}, {
         $set:{
             name:req.body.name
         }
