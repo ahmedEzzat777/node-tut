@@ -6,6 +6,7 @@ require('./startup/logging')();
 require('./startup/routes')(app);
 require('./startup/db')();
 require('./startup/config')();
+require('./startup/prod')(app);
 
 // throw new Error('uncaught'); // handled by process.on('uncaughtException',..)
 // const p = Promise.reject(new Error('uncaught promise rejection'));
