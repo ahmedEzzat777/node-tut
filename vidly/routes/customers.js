@@ -1,7 +1,8 @@
 const express = require('express');
 const Joi = require('joi');
 const router = express.Router();
-const {Customer, validate} = require('../models/customer');
+const {Customer, validate:validateCustomer} = require('../models/customer');
+const validate = require('../middleware/validate');
 const auth = require('../middleware/auth');
 
 router.get('/', async (req, res) => {
@@ -19,12 +20,8 @@ router.get('/:id', async (req, res) => {
     res.send(customer);
 });
 
-router.post('/', auth, async (req, res) =>{
+router.post('/', [auth, validate(validateCustomer)], async (req, res) =>{
     let customer = req.body;
-    const result = validate(customer);
-
-    if(result.error)
-        return res.status(400).send(result.error.details[0].message);
 
     customer = new Customer({
         name:customer.name,
@@ -35,12 +32,8 @@ router.post('/', auth, async (req, res) =>{
     return res.send(await customer.save());
 });
 
-router.put('/:id', auth, async (req, res) =>{
+router.put('/:id', [auth, validate(validateCustomer)], async (req, res) =>{
     const id = req.params.id;
-    const result = validate(req.body);
-
-    if(result.error)
-        return res.status(400).send(result.error.details[0].message);
 
     const customer = await Customer.findByIdAndUpdate(id, {
         $set:{

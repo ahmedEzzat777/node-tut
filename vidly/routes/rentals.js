@@ -1,21 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const {Rental, validate} = require('../models/rental');
+const {Rental, validate:validateRental} = require('../models/rental');
 const {Customer} = require('../models/customer');
 const {Movie} = require('../models/movie');
 const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
+const validate = require('../middleware/validate');
 
 //const Fawn = require('fawn');
 //Fawn.init(mongoose); //refused to work
 
-router.post('/', auth, async (req, res) => {
+router.post('/', [auth, validate(validateRental)], async (req, res) => {
     let rental = req.body;
-    const result = validate(rental);
-
-    if(result.error)
-        return res.status(400).send(result.error.details[0].message);
-
+    
     const customer = await Customer.findById(rental.customerId);
 
     if(!customer)

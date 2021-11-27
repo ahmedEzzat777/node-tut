@@ -14,7 +14,8 @@ const schema = mongoose.Schema({
     movie:{
         type: new mongoose.Schema({
             _id:mongoose.Types.ObjectId,
-            title:{type:String, minLength:3, maxLength:255}
+            title:{type:String, minLength:3, maxLength:255},
+            dailyRentalRate:{type:Number, min:0}
         }),
         required:true
     },

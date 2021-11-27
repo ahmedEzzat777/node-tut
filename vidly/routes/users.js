@@ -1,7 +1,8 @@
 const auth = require('../middleware/auth');
+const validate = require('../middleware/validate');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
-const {User, validate} = require('../models/user');
+const {User, validate:validateUser} = require('../models/user');
 const express = require('express');
 const router = express.Router();
 
@@ -11,12 +12,8 @@ router.get('/me', auth, async (req, res) => {
     res.send(user);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', validate(validateUser), async (req, res) => {
     let user = req.body;
-    const result = validate(user);
-
-    if(result.error)
-        return res.status(400).send(result.error.details[0].message);
 
     const existingUser = await User.findOne({email:user.email});
 
